@@ -31,6 +31,7 @@ import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @Component
@@ -64,7 +65,7 @@ public class OispOutputService implements OutputService {
             String payload = generateCompponentRegistration(name, type);
             LOG.info("Sending componentRegistration <{}> to {}", payload, agentAddress);
 
-            byte[] buf = payload.getBytes();
+            byte[] buf = payload.getBytes(StandardCharsets.UTF_8);
             DatagramPacket packet = new DatagramPacket(buf, buf.length, agentAddress);
             try {
                 socket.send(packet);
@@ -76,7 +77,7 @@ public class OispOutputService implements OutputService {
             String payload = generatePayload(name, value);
             LOG.info("Sending payload <{}> to {}", payload, agentAddress);
 
-            byte[] buf = payload.getBytes();
+            byte[] buf = payload.getBytes(StandardCharsets.UTF_8);
             DatagramPacket packet = new DatagramPacket(buf, buf.length, agentAddress);
             try {
                 socket.send(packet);
