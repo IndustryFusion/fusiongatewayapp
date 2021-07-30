@@ -11,17 +11,6 @@
 # specific language governing permissions and limitations
 # under the License.
 
-fusiongateway:
-  name: My PLC
-  oispPort: 41234
-  oispHost: localhost
-  jobSpecs:
-    betriebsdaten:
-      period: 2000
-      fields:
-        - target: "Temperatur"
-          source: "Temperatur"
-          componentType: "Temperature.v1.0"
-        - target: "Luftverbrauch"
-          source: "Luftverbrauch"
-          componentType: "Luftverbrauch.v1.0"
+server:
+  error:
+    include-stacktrace: never

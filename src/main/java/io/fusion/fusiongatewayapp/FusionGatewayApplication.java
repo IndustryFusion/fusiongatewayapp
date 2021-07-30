@@ -17,8 +17,10 @@ package io.fusion.fusiongatewayapp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.PropertySource;
 
 @SpringBootApplication
+@PropertySource("classpath:default.yaml")
 public class FusionGatewayApplication {
     public static void main(String[] args) {
         SpringApplication.run(FusionGatewayApplication.class, args);

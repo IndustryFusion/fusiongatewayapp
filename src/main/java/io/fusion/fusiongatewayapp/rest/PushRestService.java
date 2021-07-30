@@ -31,7 +31,7 @@ public class PushRestService {
         this.metricsPushService = metricsPushService;
     }
 
-    @PostMapping(path = "/gateway/{jobId}")
+    @PostMapping(path = "/{jobId}")
     public void receivePushData(@PathVariable final String jobId, @RequestBody final Map<String, String> metrics) {
         metricsPushService.receiveMetrics(jobId, metrics);
     }

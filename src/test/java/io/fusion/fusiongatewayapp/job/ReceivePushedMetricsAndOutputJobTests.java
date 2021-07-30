@@ -44,7 +44,7 @@ import static org.awaitility.Awaitility.await;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("push")
 @Testcontainers
-public class ReceivePushedMetricsAndOutputJobTests extends JobTestBase {
+class ReceivePushedMetricsAndOutputJobTests extends JobTestBase {
     @Value("http://localhost:${local.server.port}")
     String baseUrl;
 
@@ -52,7 +52,7 @@ public class ReceivePushedMetricsAndOutputJobTests extends JobTestBase {
     private FusionGatewayAppConfig appConfig;
 
     @Test
-    public void normal() throws IOException {
+    void normal() throws IOException {
         DatagramSocket socket = new DatagramSocket(appConfig.getOispPort());
         UdpPacketReceiver udpPacketReceiver = new UdpPacketReceiver(socket);
         new Thread(udpPacketReceiver).start();
@@ -69,7 +69,7 @@ public class ReceivePushedMetricsAndOutputJobTests extends JobTestBase {
                 .body(sourceMetrics)
 
                 .when()
-                .post(baseUrl + "/gateway/betriebsdaten")
+                .post(baseUrl + "/betriebsdaten")
 
                 .then()
                 .statusCode(200);
@@ -93,7 +93,7 @@ public class ReceivePushedMetricsAndOutputJobTests extends JobTestBase {
     }
 
     @Test
-    public void unknownMetrics() throws SocketException {
+    void unknownMetrics() throws SocketException {
         DatagramSocket socket = new DatagramSocket(appConfig.getOispPort());
         UdpPacketReceiver udpPacketReceiver = new UdpPacketReceiver(socket);
         new Thread(udpPacketReceiver).start();
@@ -109,7 +109,7 @@ public class ReceivePushedMetricsAndOutputJobTests extends JobTestBase {
                 .body(sourceMetrics)
 
                 .when()
-                .post(baseUrl + "/gateway/betriebsdaten")
+                .post(baseUrl + "/betriebsdaten")
 
                 .then()
                 .statusCode(200);
