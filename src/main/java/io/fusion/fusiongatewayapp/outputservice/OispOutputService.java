@@ -61,30 +61,34 @@ public class OispOutputService implements OutputService {
 
     @Override
     public void sendMetrics(Map<String, String> metrics, Map<String, String> components) {
-        components.forEach((name, type) -> {
-            String payload = generateCompponentRegistration(name, type);
-            LOG.info("Sending componentRegistration <{}> to {}", payload, agentAddress);
+        if (components != null) {
+            components.forEach((name, type) -> {
+                String payload = generateCompponentRegistration(name, type);
+                LOG.info("Sending componentRegistration <{}> to {}", payload, agentAddress);
 
-            byte[] buf = payload.getBytes(StandardCharsets.UTF_8);
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, agentAddress);
-            try {
-                socket.send(packet);
-            } catch (IOException e) {
-                throw new UdpException("Socket send: componentRegistration", e);
-            }
-        });
-        metrics.forEach((name, value) -> {
-            String payload = generatePayload(name, value);
-            LOG.info("Sending payload <{}> to {}", payload, agentAddress);
+                byte[] buf = payload.getBytes(StandardCharsets.UTF_8);
+                DatagramPacket packet = new DatagramPacket(buf, buf.length, agentAddress);
+                try {
+                    socket.send(packet);
+                } catch (IOException e) {
+                    throw new UdpException("Socket send: componentRegistration", e);
+                }
+            });
+        }
+        if (metrics != null) {
+            metrics.forEach((name, value) -> {
+                String payload = generatePayload(name, value);
+                LOG.info("Sending payload <{}> to {}", payload, agentAddress);
 
-            byte[] buf = payload.getBytes(StandardCharsets.UTF_8);
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, agentAddress);
-            try {
-                socket.send(packet);
-            } catch (IOException e) {
-                throw new UdpException("Socket send: metric", e);
-            }
-        });
+                byte[] buf = payload.getBytes(StandardCharsets.UTF_8);
+                DatagramPacket packet = new DatagramPacket(buf, buf.length, agentAddress);
+                try {
+                    socket.send(packet);
+                } catch (IOException e) {
+                    throw new UdpException("Socket send: metric", e);
+                }
+            });
+        }
     }
 
     private String generateCompponentRegistration(String metricName, String metricType) {

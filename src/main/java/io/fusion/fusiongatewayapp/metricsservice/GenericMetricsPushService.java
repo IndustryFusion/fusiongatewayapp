@@ -17,11 +17,13 @@ package io.fusion.fusiongatewayapp.metricsservice;
 
 import io.fusion.fusiongatewayapp.mapper.MetricsMapper;
 import io.fusion.fusiongatewayapp.outputservice.OutputService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+@Slf4j
 @Component
 public class GenericMetricsPushService implements MetricsPushService {
     private final OutputService outputService;
@@ -36,6 +38,7 @@ public class GenericMetricsPushService implements MetricsPushService {
 
     @Override
     public void receiveMetrics(String jobId, Map<String, String> sourceMetrics) {
+        log.info("Handling {} metrics with job {}.", sourceMetrics.size(), jobId);
         Map<String, String> targetMetrics = metricsMapper.mapSourceToTargetMetrics(jobId, sourceMetrics);
 
         Map<String, String> components = metricsMapper.getComponents(jobId);

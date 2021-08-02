@@ -16,6 +16,7 @@
 package io.fusion.fusiongatewayapp.mapper;
 
 import io.fusion.fusiongatewayapp.config.FusionGatewayAppConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public class MetricsMapper {
     private final FusionGatewayAppConfig appConfig;
 
@@ -33,6 +35,10 @@ public class MetricsMapper {
 
     public Map<String, String> mapSourceToTargetMetrics(final String jobId, final Map<String, String> sourceMetrics) {
         FusionGatewayAppConfig.JobSpec jobSpec = appConfig.getJobSpecs().get(jobId);
+        if (jobSpec == null) {
+            log.warn("No job with id {} found!", jobId);
+            return null;
+        }
 
         return jobSpec.getFields().stream()
                 .filter(fieldSpec -> sourceMetrics.containsKey(fieldSpec.getSource()))
@@ -42,6 +48,10 @@ public class MetricsMapper {
 
     public Map<String, String> getComponents(final String jobId) {
         final FusionGatewayAppConfig.JobSpec jobSpec = appConfig.getJobSpecs().get(jobId);
+        if (jobSpec == null) {
+            log.warn("No job with id {} found!", jobId);
+            return null;
+        }
 
         return jobSpec.getFields().stream()
                 .collect(Collectors.toMap(FusionGatewayAppConfig.FieldSpec::getTarget,
