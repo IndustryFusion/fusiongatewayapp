@@ -13,10 +13,9 @@
  * under the License.
  */
 
-package io.fusion.fusiongatewayapp.job;
+package io.fusion.fusiongatewayapp.metricsservice;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -24,9 +23,8 @@ import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class JobTestBase {
-    private static final Logger LOG = LoggerFactory.getLogger(JobTestBase.class);
-
     public String normaliseNewlines(final String payload) {
         return payload.replace("\n", "").replace("\r", "");
     }
@@ -69,7 +67,7 @@ public class JobTestBase {
             DatagramPacket packet = new DatagramPacket(receive, receive.length);
             socket.receive(packet);
             final String payload = new String(packet.getData()).trim();
-            LOG.info("UDP Packet received: " + payload);
+            log.info("UDP Packet received: " + payload);
             return payload;
         }
     }

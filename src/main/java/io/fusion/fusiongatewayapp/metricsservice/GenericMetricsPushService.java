@@ -15,34 +15,42 @@
 
 package io.fusion.fusiongatewayapp.metricsservice;
 
-import io.fusion.fusiongatewayapp.mapper.MetricsMapper;
-import io.fusion.fusiongatewayapp.outputservice.OutputService;
+import io.fusion.core.source.MetricsPushService;
+import io.fusion.core.source.PushCallback;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
 @Component
+@Primary
 public class GenericMetricsPushService implements MetricsPushService {
-    private final OutputService outputService;
-    private final MetricsMapper metricsMapper;
+    private final Map<String, PushCallback> jobCallbacks = new HashMap<>();
 
-    @Autowired
-    public GenericMetricsPushService(OutputService outputService,
-                                     MetricsMapper metricsMapper) {
-        this.outputService = outputService;
-        this.metricsMapper = metricsMapper;
+    @Override
+    public void start(String jobId, PushCallback pushCallback) {
+        jobCallbacks.put(jobId, pushCallback);
     }
 
     @Override
-    public void receiveMetrics(String jobId, Map<String, String> sourceMetrics) {
-        log.info("Handling {} metrics with job {}.", sourceMetrics.size(), jobId);
-        Map<String, String> targetMetrics = metricsMapper.mapSourceToTargetMetrics(jobId, sourceMetrics);
+    public void stop(String jobId) {
+        jobCallbacks.remove(jobId);
+    }
 
-        Map<String, String> components = metricsMapper.getComponents(jobId);
+    public void stopAll() {
+        jobCallbacks.clear();
+    }
 
-        outputService.sendMetrics(targetMetrics, components);
+    public void handleMetrics(String jobId, Map<String, Object> metrics) {
+        log.info("Handling {} metrics with job {}.", metrics.size(), jobId);
+        final PushCallback pushCallback = jobCallbacks.get(jobId);
+        if (pushCallback == null) {
+            log.warn("Job not found {}!", jobId);
+            return;
+        }
+        pushCallback.handleMetrics(jobId, metrics);
     }
 }

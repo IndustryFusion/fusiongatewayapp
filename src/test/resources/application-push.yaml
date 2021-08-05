@@ -11,22 +11,25 @@
 # specific language governing permissions and limitations
 # under the License.
 
-fusiongateway:
+fusiondataservice:
   name: My Rest
-  oispPort: 41234
-  oispHost: localhost
+  connectionString: localhost:41234
+  dataServiceType: PUSH
   jobSpecs:
     betriebsdaten:
       fields:
         - source: "pressure_bottle_left"
           target: "pressure_bottle_left"
-          componentType: "Druck.v1.0"
         - source: "pressure_bottle_right"
           target: "pressure_bottle_right"
-          componentType: "Druck.v1.0"
         - source: "pressure_pipe"
           target: "pressure_pipe"
-          componentType: "Druck.v1.0"
         - source: "E2MIX-Entnahmedruck_1"
           target: "pressure_takeoff_1"
-          componentType: "Druck.v1.0"
+
+fusiongateway:
+  componentMap:
+    pressure_bottle_left: "Druck.v1.0"
+    pressure_bottle_right: "Druck.v1.0"
+    pressure_pipe: "Druck.v1.0"
+    pressure_takeoff_1: "Druck.v1.0"

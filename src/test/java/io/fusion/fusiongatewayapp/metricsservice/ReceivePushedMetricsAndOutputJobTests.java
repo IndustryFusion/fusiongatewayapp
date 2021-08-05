@@ -13,11 +13,12 @@
  * under the License.
  */
 
-package io.fusion.fusiongatewayapp.job;
+package io.fusion.fusiongatewayapp.metricsservice;
 
-import io.fusion.fusiongatewayapp.config.FusionGatewayAppConfig;
+import io.fusion.core.config.FusionDataServiceConfig;
 import io.restassured.http.ContentType;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,12 +49,19 @@ class ReceivePushedMetricsAndOutputJobTests extends JobTestBase {
     @Value("http://localhost:${local.server.port}")
     String baseUrl;
 
+    static int oispPort;
+
     @Autowired
-    private FusionGatewayAppConfig appConfig;
+    private FusionDataServiceConfig fusionDataServiceConfig;
+
+    @BeforeEach
+    void beforeEach() {
+        oispPort = Integer.parseInt(fusionDataServiceConfig.getConnectionString().split(":")[1]);
+    }
 
     @Test
     void normal() throws IOException {
-        DatagramSocket socket = new DatagramSocket(appConfig.getOispPort());
+        DatagramSocket socket = new DatagramSocket(oispPort);
         UdpPacketReceiver udpPacketReceiver = new UdpPacketReceiver(socket);
         new Thread(udpPacketReceiver).start();
 
@@ -74,14 +82,13 @@ class ReceivePushedMetricsAndOutputJobTests extends JobTestBase {
                 .then()
                 .statusCode(200);
 
-        await().until(() -> udpPacketReceiver.getMessages().size() == 7);
+        await().until(() -> udpPacketReceiver.getMessages().size() == 6);
 
         List<String> receivedMessages = udpPacketReceiver.getMessages().stream().map(this::normaliseNewlines).collect(Collectors.toList());
 
         List<String> expectedMessages = new ArrayList<>();
         expectedMessages.add("{\"n\":\"pressure_bottle_right\",\"t\":\"Druck.v1.0\"}");
         expectedMessages.add("{\"n\":\"pressure_takeoff_1\",\"t\":\"Druck.v1.0\"}");
-        expectedMessages.add("{\"n\":\"pressure_pipe\",\"t\":\"Druck.v1.0\"}");
         expectedMessages.add("{\"n\":\"pressure_bottle_left\",\"t\":\"Druck.v1.0\"}");
         expectedMessages.add("{\"n\":\"pressure_bottle_right\",\"v\":\"0.0\"}");
         expectedMessages.add("{\"n\":\"pressure_takeoff_1\",\"v\":\"12.01\"}");
@@ -94,13 +101,15 @@ class ReceivePushedMetricsAndOutputJobTests extends JobTestBase {
 
     @Test
     void unknownMetrics() throws SocketException {
-        DatagramSocket socket = new DatagramSocket(appConfig.getOispPort());
+        DatagramSocket socket = new DatagramSocket(oispPort);
         UdpPacketReceiver udpPacketReceiver = new UdpPacketReceiver(socket);
         new Thread(udpPacketReceiver).start();
 
         Map<String, String> sourceMetrics = new HashMap<>();
         sourceMetrics.put("pressure_box", "0.0");
         sourceMetrics.put("pressure_sox", "140.6");
+        sourceMetrics.put("pressure_bottle_left", "139.2");
+
 
         udpPacketReceiver.reset();
 
@@ -114,19 +123,19 @@ class ReceivePushedMetricsAndOutputJobTests extends JobTestBase {
                 .then()
                 .statusCode(200);
 
-        await().until(() -> udpPacketReceiver.getMessages().size() == 4);
+        await().until(() -> udpPacketReceiver.getMessages().size() == 2);
 
         List<String> receivedMessages = udpPacketReceiver.getMessages().stream().map(this::normaliseNewlines).collect(Collectors.toList());
 
         List<String> expectedMessages = new ArrayList<>();
-        expectedMessages.add("{\"n\":\"pressure_bottle_right\",\"t\":\"Druck.v1.0\"}");
-        expectedMessages.add("{\"n\":\"pressure_takeoff_1\",\"t\":\"Druck.v1.0\"}");
-        expectedMessages.add("{\"n\":\"pressure_pipe\",\"t\":\"Druck.v1.0\"}");
         expectedMessages.add("{\"n\":\"pressure_bottle_left\",\"t\":\"Druck.v1.0\"}");
+        expectedMessages.add("{\"n\":\"pressure_bottle_left\",\"v\":\"139.2\"}");
 
         assertThat(receivedMessages).containsExactlyInAnyOrderElementsOf(expectedMessages);
 
         udpPacketReceiver.cancel();
         socket.close();
     }
+
+
 }

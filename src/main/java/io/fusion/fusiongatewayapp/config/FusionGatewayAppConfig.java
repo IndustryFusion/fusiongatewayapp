@@ -19,66 +19,11 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Map;
 
 @Component
 @ConfigurationProperties("fusiongateway")
 @Data
 public class FusionGatewayAppConfig {
-    private String name;
-    private Integer oispPort;
-    private String oispHost;
-    private Map<String, JobSpec> jobSpecs;
-
-    public static class JobSpec {
-        private Integer period;
-        private List<FieldSpec> fields;
-
-        public Integer getPeriod() {
-            return period;
-        }
-
-        public void setPeriod(Integer period) {
-            this.period = period;
-        }
-
-        public List<FieldSpec> getFields() {
-            return fields;
-        }
-
-        public void setFields(List<FieldSpec> fields) {
-            this.fields = fields;
-        }
-    }
-
-    public static class FieldSpec {
-        private String source;
-        private String target;
-        private String componentType;
-
-        public String getSource() {
-            return source;
-        }
-
-        public void setSource(String source) {
-            this.source = source;
-        }
-
-        public String getTarget() {
-            return target;
-        }
-
-        public void setTarget(String target) {
-            this.target = target;
-        }
-
-        public String getComponentType() {
-            return componentType;
-        }
-
-        public void setComponentType(String componentType) {
-            this.componentType = componentType;
-        }
-    }
+    private Map<String, String> componentMap;
 }

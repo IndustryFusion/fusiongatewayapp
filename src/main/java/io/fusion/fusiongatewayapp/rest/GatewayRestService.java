@@ -15,7 +15,7 @@
 
 package io.fusion.fusiongatewayapp.rest;
 
-import io.fusion.fusiongatewayapp.metricsservice.MetricsPushService;
+import io.fusion.fusiongatewayapp.metricsservice.GenericMetricsPushService;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,15 +24,15 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
-public class PushRestService {
-    private final MetricsPushService metricsPushService;
+public class GatewayRestService {
+    private final GenericMetricsPushService genericMetricsPushService;
 
-    public PushRestService(MetricsPushService metricsPushService) {
-        this.metricsPushService = metricsPushService;
+    public GatewayRestService(GenericMetricsPushService genericMetricsPushService) {
+        this.genericMetricsPushService = genericMetricsPushService;
     }
 
     @PostMapping(path = "/{jobId}")
-    public void receivePushData(@PathVariable final String jobId, @RequestBody final Map<String, String> metrics) {
-        metricsPushService.receiveMetrics(jobId, metrics);
+    public void receivePushData(@PathVariable final String jobId, @RequestBody final Map<String, Object> metrics) {
+        genericMetricsPushService.handleMetrics(jobId, metrics);
     }
 }

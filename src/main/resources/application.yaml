@@ -11,17 +11,19 @@
 # specific language governing permissions and limitations
 # under the License.
 
-fusiongateway:
+fusiondataservice:
   name: My PLC
-  oispPort: 41234
-  oispHost: localhost
+  connectionString: localhost:41234
+  dataServiceType: PUSH
   jobSpecs:
     betriebsdaten:
-      period: 2000
       fields:
-        - target: "Temperatur"
-          source: "Temperatur"
-          componentType: "Temperature.v1.0"
-        - target: "Luftverbrauch"
-          source: "Luftverbrauch"
-          componentType: "Luftverbrauch.v1.0"
+        - source: "Temperatur"
+          target: "Temperatur"
+        - source: "Luftverbrauch"
+          target: "Luftverbrauch"
+
+fusiongateway:
+  componentMap:
+    Temperatur: "Temperature.v1.0"
+    Luftverbrauch: "Luftverbrauch.v1.0"
