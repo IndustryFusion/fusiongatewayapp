@@ -22,7 +22,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@PropertySource("classpath:default.yaml")
+@PropertySource("classpath:default.properties")
 @ComponentScan("io.fusion")
 @EnableScheduling
 public class FusionGatewayApplication {
